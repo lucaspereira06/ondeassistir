@@ -1,0 +1,296 @@
+.main {
+  padding: 2rem 1rem;
+}
+
+.filtersWrapper {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.5rem 1rem;
+  cursor: grab;
+}
+
+.filters.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.filters.dragging button {
+  pointer-events: none;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .filters {
+    justify-content: center;
+  }
+}
+
+.dateTab {
+  flex-shrink: 0;
+  padding: 0.75rem 2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  color: var(--text-muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.dateTab:hover {
+  background: white;
+  color: var(--foreground);
+}
+
+.dateTab.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.matchHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding-bottom: 0.75rem;
+}
+
+.teams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 40%;
+}
+
+.teamLogo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.teamName {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+.vs {
+  font-weight: 800;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  opacity: 0.5;
+}
+
+.transmissions {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  padding-top: 1rem;
+}
+
+.transmissionItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  transition: opacity 0.2s ease;
+}
+
+.transmissionItem:last-child {
+  border-bottom: none;
+}
+
+.transmissionItem:hover {
+  opacity: 0.7;
+}
+
+.transmissionLogo {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.05);
+  padding: 4px;
+}
+
+.transmissionLogoPlaceholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.transmissionInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.transmissionName {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--foreground);
+}
+
+.transmissionDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.transmissionEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: rgba(0,0,0,0.02);
+  border-radius: 8px;
+}
+
+.championshipGroup {
+  margin-bottom: 4rem;
+}
+
+.championshipTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 2px solid rgba(0,0,0,0.05);
+  padding-bottom: 0.5rem;
+}
+
+.combos {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.select {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: white;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--foreground);
+  min-width: 250px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.select:focus {
+  border-color: var(--primary);
+}
+
+.advancedFiltersToggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Layout Changes for Ads */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.content {
+  flex: 1;
+}
+
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    flex-direction: row;
+  }
+  .sidebar {
+    display: block;
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 2rem;
+    height: max-content;
+  }
+}
+
+.inFeedAd {
+  grid-column: span 1;
+}
