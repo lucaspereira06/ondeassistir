@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, MouseEvent as ReactMouseEvent } from 'react'
 import styles from '@/app/page.module.css'
-import { Filter, Trophy } from 'lucide-react'
+import { Filter, Trophy, Search } from 'lucide-react'
 import AdSlot from '@/components/AdSlot'
 import MatchCard from '@/components/MatchCard'
 import { Fixture } from '@/types'
@@ -23,6 +23,7 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
   const [filterDate, setFilterDate] = useState<string>(todayStr)
   const [filterTeam, setFilterTeam] = useState<string>('all')
   const [filterChamp, setFilterChamp] = useState<string>('all')
+  const [searchTerm, setSearchTerm] = useState<string>('')
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
 
   // Drag to scroll logic
@@ -119,9 +120,19 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
         if (hName !== filterTeam && aName !== filterTeam) return false
       }
 
+      if (searchTerm.trim() !== '') {
+        const search = searchTerm.toLowerCase().trim()
+        const hName = (p.home_team?.popular_name || p.home_team?.name || '').toLowerCase()
+        const aName = (p.away_team?.popular_name || p.away_team?.name || '').toLowerCase()
+        const cName = (p.competition?.name || '').toLowerCase()
+        if (!hName.includes(search) && !aName.includes(search) && !cName.includes(search)) {
+          return false
+        }
+      }
+
       return true
     })
-  }, [initialPartidas, filterDate, filterChamp, filterTeam])
+  }, [initialPartidas, filterDate, filterChamp, filterTeam, searchTerm])
 
   // Group by championship
   const grouped = useMemo(() => {
@@ -140,6 +151,17 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
         <h1 className="title">Onde Assistir?</h1>
         <p className="subtitle">Descubra em qual canal vai passar o jogo do seu time em segundos.</p>
       </header>
+
+      <div className={styles.searchWrapper}>
+        <Search className={styles.searchIcon} size={20} />
+        <input 
+          type="text" 
+          placeholder="Buscar time, campeonato..."
+          className={styles.searchInput}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
 
       <AdSlot height="90px" />
 
