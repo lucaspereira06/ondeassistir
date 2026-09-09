@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 export const revalidate = 3600 // Cache sitemap for 1 hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ondeassistirjogos.vercel.app'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ondeassistirjogos.com'
 
   // Fetch all slugs
   const [{ data: fixtures }, { data: teams }, { data: competitions }] = await Promise.all([

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ondeassistirjogos.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ondeassistirjogos.com'),
   title: "Onde Assistir? Futebol ao vivo hoje na TV e Streaming",
   description: "Descubra em qual canal vai passar o jogo do seu time hoje. Agenda completa de transmissões de futebol ao vivo na TV e Streaming.",
 };
