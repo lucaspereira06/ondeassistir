@@ -27,7 +27,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8998304443137528"
-          crossOrigin="anonymous"
         ></script>
       </head>
       <body>
