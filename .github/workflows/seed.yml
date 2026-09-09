@@ -1,0 +1,30 @@
+name: Seed Pipeline
+
+on:
+  schedule:
+    # Executa todos os dias às 07:00 UTC (04:00 UTC-3)
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run Seed Script
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: go run cmd/seed/main.go
