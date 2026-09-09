@@ -29,6 +29,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description: desc,
+    alternates: {
+      canonical: `/jogo/${slug}`,
+    },
   }
 }
 
@@ -89,8 +92,28 @@ export default async function JogoPage({ params }: { params: Promise<{ slug: str
     .order('start_at', { ascending: true })
     .limit(4)
 
+  const schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'SportsEvent',
+    name: `${partida.home_team?.popular_name} x ${partida.away_team?.popular_name}`,
+    startDate: partida.start_at,
+    homeTeam: {
+      '@type': 'SportsTeam',
+      name: partida.home_team?.name,
+    },
+    awayTeam: {
+      '@type': 'SportsTeam',
+      name: partida.away_team?.name,
+    },
+    description: `Assista ${partida.home_team?.popular_name} x ${partida.away_team?.popular_name} ao vivo.`,
+  }
+
   return (
     <main className={styles.main}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
       <div className="container">
         {/* Top Banner Ad */}
         <AdSlot height="90px" />

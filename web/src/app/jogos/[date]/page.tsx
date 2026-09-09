@@ -16,8 +16,11 @@ export async function generateMetadata({ params }: { params: Promise<{ date: str
   const dateDisplay = formatterDisplay.format(d)
 
   return {
-    title: `Jogos de futebol em ${dateDisplay} | Onde Assistir`,
-    description: `Confira todos os jogos de futebol e onde assistir na TV e Streaming na data de ${dateDisplay}.`,
+    title: `Jogos do dia ${dateDisplay}: onde assistir ao vivo | Onde Assistir`,
+    description: `Confira a grade completa de jogos de futebol do dia ${dateDisplay} e saiba onde assistir ao vivo.`,
+    alternates: {
+      canonical: `/jogos/${date}`,
+    },
   }
 }
 

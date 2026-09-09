@@ -15,6 +15,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${comp.name}: jogos e onde assistir | Onde Assistir`,
     description: `Confira a tabela de próximos jogos da ${comp.name} e saiba onde assistir ao vivo na TV e Streaming.`,
+    alternates: {
+      canonical: `/campeonato/${slug}`,
+    },
   }
 }
 

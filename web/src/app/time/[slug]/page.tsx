@@ -14,8 +14,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!team) return { title: 'Time não encontrado | Onde Assistir' }
   const name = team.popular_name || team.name
   return {
-    title: `Jogos do ${name}: onde assistir e próximos jogos | Onde Assistir`,
-    description: `Confira a agenda completa de jogos do ${name} e saiba em qual canal vai passar na TV e Streaming.`,
+    title: `Jogos do ${name} hoje e onde assistir ao vivo | Onde Assistir`,
+    description: `Acompanhe os próximos jogos do ${name} e saiba em qual canal vai passar na TV e Streaming.`,
+    alternates: {
+      canonical: `/time/${slug}`,
+    },
   }
 }
 
