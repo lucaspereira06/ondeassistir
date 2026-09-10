@@ -118,7 +118,7 @@ func main() {
 			fixtureSlug := fmt.Sprintf("%s-x-%s-%s", homeSlug, awaySlug, parsedStartAt.Format("2006-01-02"))
 
 			// Upsert Fixture
-			fixtureId, err := repo.UpsertFixture(compId, homeId, awayId, parsedStartAt, m.Match.Phase.Name, fixtureSlug)
+			fixtureId, err := repo.UpsertFixture(compId, homeId, awayId, parsedStartAt, m.Match.Phase.Name, fixtureSlug, m.Match.Location.PopularName)
 			if err != nil {
 				log.Printf("Erro ao salvar fixture %d: %v", m.Match.ID, err)
 				continue

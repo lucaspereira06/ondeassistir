@@ -1,7 +1,7 @@
 import React from 'react'
 import { supabase } from '@/lib/supabase'
 import styles from '@/app/page.module.css'
-import { Tv, Clock, ChevronRight } from 'lucide-react'
+import { Tv, Clock, ChevronRight, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import AdSlot from '@/components/AdSlot'
 import MatchCard from '@/components/MatchCard'
@@ -44,6 +44,7 @@ export default async function JogoPage({ params }: { params: Promise<{ slug: str
       slug,
       start_at,
       phase,
+      location,
       competition:competitions(name, slug),
       home_team:teams!home_team_id(name, popular_name, logo_url, slug),
       away_team:teams!away_team_id(name, popular_name, logo_url, slug),
@@ -79,7 +80,7 @@ export default async function JogoPage({ params }: { params: Promise<{ slug: str
   const { data: relatedMatches } = await supabase
     .from('fixtures')
     .select(`
-      id, slug, start_at,
+      id, slug, start_at, location,
       competition:competitions(name, slug),
       home_team:teams!home_team_id(name, popular_name, logo_url, slug),
       away_team:teams!away_team_id(name, popular_name, logo_url, slug),
@@ -104,6 +105,10 @@ export default async function JogoPage({ params }: { params: Promise<{ slug: str
     awayTeam: {
       '@type': 'SportsTeam',
       name: partida.away_team?.name,
+    },
+    location: {
+      '@type': 'Place',
+      name: partida.location || 'A Definir'
     },
     description: `Assista ${partida.home_team?.popular_name} x ${partida.away_team?.popular_name} ao vivo.`,
   }
@@ -137,7 +142,13 @@ export default async function JogoPage({ params }: { params: Promise<{ slug: str
                 {dateStr} às {timeStr}
               </div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>
-                {partida.competition?.name} {partida.phase && `— ${partida.phase}`}
+                <div>{partida.competition?.name} {partida.phase && `— ${partida.phase}`}</div>
+                {partida.location && (
+                  <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                    <MapPin size={14} />
+                    <span>{partida.location}</span>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem', marginBottom: '3rem' }}>

@@ -58,7 +58,7 @@ func (r *Repository) UpsertExternalTeam(teamId int, provider, externalId, extern
 	return err
 }
 
-func (r *Repository) UpsertFixture(competitionId, homeTeamId, awayTeamId int, startAt time.Time, phase, slug string) (int, error) {
+func (r *Repository) UpsertFixture(competitionId, homeTeamId, awayTeamId int, startAt time.Time, phase, slug, location string) (int, error) {
 	var id int
 	err := r.db.QueryRow(`
 		SELECT id FROM fixtures 
@@ -66,16 +66,16 @@ func (r *Repository) UpsertFixture(competitionId, homeTeamId, awayTeamId int, st
 	`, competitionId, homeTeamId, awayTeamId, startAt).Scan(&id)
 	
 	if err == nil {
-		_, _ = r.db.Exec(`UPDATE fixtures SET slug = $1, phase = $2, updated_at = NOW() WHERE id = $3`, slug, phase, id)
+		_, _ = r.db.Exec(`UPDATE fixtures SET slug = $1, phase = $2, location = $3, updated_at = NOW() WHERE id = $4`, slug, phase, location, id)
 		return id, nil
 	}
 
 	query := `
-		INSERT INTO fixtures (competition_id, home_team_id, away_team_id, start_at, phase, slug)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO fixtures (competition_id, home_team_id, away_team_id, start_at, phase, slug, location)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id;
 	`
-	err = r.db.QueryRow(query, competitionId, homeTeamId, awayTeamId, startAt, phase, slug).Scan(&id)
+	err = r.db.QueryRow(query, competitionId, homeTeamId, awayTeamId, startAt, phase, slug, location).Scan(&id)
 	return id, err
 }
 
