@@ -6,6 +6,7 @@ import styles from './AdSlot.module.css'
 interface AdSlotProps {
   width?: string
   height?: string
+  format?: 'horizontal' | 'vertical' | 'rectangle' | 'auto' | 'fluid'
   isSticky?: boolean
   className?: string
   hideOnMobile?: boolean
@@ -15,6 +16,7 @@ interface AdSlotProps {
 export default function AdSlot({
   width = '100%',
   height = 'auto',
+  format = 'horizontal',
   isSticky = false,
   className = '',
   hideOnMobile = false,
@@ -40,10 +42,10 @@ export default function AdSlot({
     >
       <ins
         className="adsbygoogle"
-        style={{ display: 'block', width: '100%' }}
+        style={{ display: 'block', width: '100%', height: '100%' }}
         data-ad-client="ca-pub-8998304443137528"
         data-ad-slot="1316239608"
-        data-ad-format="horizontal"
+        data-ad-format={format}
         data-full-width-responsive="true"
       ></ins>
     </div>

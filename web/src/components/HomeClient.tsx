@@ -266,7 +266,7 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
         </div>
 
         <aside className={styles.sidebar}>
-          <AdSlot width="300px" height="600px" hideOnMobile />
+          <AdSlot width="300px" height="600px" format="vertical" hideOnMobile />
         </aside>
       </div>
 

@@ -293,6 +293,7 @@
 
 .inFeedAd {
   grid-column: span 1;
+  margin-bottom: 0;
 }
 
 .searchWrapper {
