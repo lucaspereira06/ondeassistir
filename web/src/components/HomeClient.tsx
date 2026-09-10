@@ -148,14 +148,16 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
   return (
     <main className={`container animate-enter`}>
       <header>
-        <h1 className="title">Onde Assistir?</h1>
-        <p className="subtitle">Descubra em qual canal vai passar o jogo do seu time em segundos.</p>
+        <h1 className="title">Encontre o jogo do seu time</h1>
+        <p className="subtitle">Descubra em qual canal vai passar o jogo em segundos.</p>
       </header>
+
+      <AdSlot height="90px" />
 
       <div className={styles.searchWrapper}>
         <Search className={styles.searchIcon} size={20} />
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder="Buscar time, campeonato..."
           className={styles.searchInput}
           value={searchTerm}
@@ -163,10 +165,8 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
         />
       </div>
 
-      <AdSlot height="90px" />
-
       <div className={styles.filtersWrapper}>
-        <div 
+        <div
           className={`${styles.filters} ${isDragging ? styles.dragging : ''}`}
           ref={scrollRef}
           onMouseDown={onMouseDown}
@@ -222,7 +222,7 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
               Nenhuma partida encontrada para estes filtros.
             </div>
           )}
-          
+
           {grouped.map(([champName, matches]) => (
             <div key={champName} className={styles.championshipGroup}>
               <h2 className={styles.championshipTitle}><Trophy size={24} /> {champName}</h2>
