@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -11,6 +10,22 @@ import (
 	"github.com/onde-assistir/internal/db"
 	"github.com/onde-assistir/internal/provider/scores365"
 )
+
+var channelLogos = map[string]string{
+	"cazétv": "/logos_canais/cazetv.png",
+	"canal goat": "/logos_canais/canalgoat.png",
+	"tnt sports": "/logos_canais/tnt_sports.png",
+	"space": "/logos_canais/space.png",
+	"espn": "/logos_canais/espn.png",
+	"espn 4": "/logos_canais/espn4.png",
+	"band": "/logos_canais/band.png",
+	"record": "/logos_canais/record.png",
+	"sbt": "/logos_canais/sbt.png",
+	"romário tv": "/logos_canais/romario_tv.png",
+	"sportynet": "/logos_canais/sportynet.png",
+	"x-sports": "/logos_canais/xsports.png",
+	"youtube sportynet": "/logos_canais/youtube_sportynet.png",
+}
 
 func normalizeTeamName(name string, aliases map[string]string) string {
 	s := strings.ToLower(name)
@@ -123,13 +138,23 @@ func main() {
 
 				srcType := "TV"
 				lowerNet := strings.ToLower(netName)
+
+				// Normalização de Nomes dos Canais (Exibição)
+				if strings.Contains(lowerNet, "youtube tnt sports") {
+					netName = "TNT Sports"
+					lowerNet = "tnt sports"
+				} else if strings.Contains(lowerNet, "prime video") || strings.Contains(lowerNet, "prime vídeo") || strings.Contains(lowerNet, "amazon prime") {
+					netName = "Prime Vídeo"
+					lowerNet = "prime vídeo"
+				}
+
 				if strings.Contains(lowerNet, "play") || strings.Contains(lowerNet, "+") || strings.Contains(lowerNet, "max") || strings.Contains(lowerNet, "prime") || strings.Contains(lowerNet, "youtube") || strings.Contains(lowerNet, "cazé") || strings.Contains(lowerNet, "goat") {
 					srcType = "STREAMING"
 				}
 
 				logoUrl := ""
-				if net.ID > 0 && net.ImageVersion > 0 {
-					logoUrl = fmt.Sprintf("https://imagecache.365scores.com/image/upload/f_png,w_48,h_48/v%d/TvNetworks/%d", net.ImageVersion, net.ID)
+				if val, ok := channelLogos[lowerNet]; ok {
+					logoUrl = val
 				}
 
 				sourceId, _ := repo.UpsertBroadcastSource(netName, srcType, logoUrl)
