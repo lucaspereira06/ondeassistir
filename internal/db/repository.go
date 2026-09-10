@@ -106,17 +106,69 @@ func (r *Repository) UpsertBroadcastSource(canonicalName, sourceType, logoUrl st
 	return id, err
 }
 
-func (r *Repository) UpsertBroadcast(fixtureId, sourceId int, name, description, urlStr, transmissionId string) error {
+func (r *Repository) UpsertBroadcast(fixtureId, sourceId int, name, description, urlStr, transmissionId, provider string) error {
 	query := `
-		INSERT INTO broadcasts (fixture_id, source_id, name, description, url, transmission_id)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO broadcasts (fixture_id, source_id, name, description, url, transmission_id, provider)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		ON CONFLICT (fixture_id, source_id) DO UPDATE SET
 			name = EXCLUDED.name,
 			description = EXCLUDED.description,
 			url = EXCLUDED.url,
 			transmission_id = EXCLUDED.transmission_id,
+			provider = EXCLUDED.provider,
 			updated_at = NOW();
 	`
-	_, err := r.db.Exec(query, fixtureId, sourceId, name, description, urlStr, transmissionId)
+	_, err := r.db.Exec(query, fixtureId, sourceId, name, description, urlStr, transmissionId, provider)
 	return err
+}
+
+type FixtureMatch struct {
+	ID        int
+	HomeTeam  string
+	AwayTeam  string
+	StartAt   time.Time
+}
+
+func (r *Repository) GetFixturesInDateRange(startDate, endDate time.Time) ([]FixtureMatch, error) {
+	query := `
+		SELECT f.id, th.name, ta.name, f.start_at
+		FROM fixtures f
+		JOIN teams th ON f.home_team_id = th.id
+		JOIN teams ta ON f.away_team_id = ta.id
+		WHERE f.start_at >= $1 AND f.start_at <= $2
+	`
+	rows, err := r.db.Query(query, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var fixtures []FixtureMatch
+	for rows.Next() {
+		var f FixtureMatch
+		if err := rows.Scan(&f.ID, &f.HomeTeam, &f.AwayTeam, &f.StartAt); err != nil {
+			return nil, err
+		}
+		fixtures = append(fixtures, f)
+	}
+	return fixtures, nil
+}
+
+func (r *Repository) GetTeamAliases() (map[string]string, error) {
+	query := `SELECT alias, normalized_name FROM team_aliases`
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	aliases := make(map[string]string)
+	for rows.Next() {
+		var alias, normalizedName string
+		if err := rows.Scan(&alias, &normalizedName); err != nil {
+			return nil, err
+		}
+		aliases[alias] = normalizedName
+	}
+	return aliases, nil
 }

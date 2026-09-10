@@ -40,6 +40,7 @@ var campeonatos = []ConfigCompeticao{
 	{"Taça Conmebol Libertadores", "taca-libertadores", "libertadores-2026"},
 	{"Copa Sul-Americana", "copa-sul-americana", "copa-sul-americana-2026"},
 	{"Campeonato Brasileiro", "campeonato-brasileiro", "campeonato-brasileiro-2026"},
+	{"Campeonato Brasileiro Série B", "campeonato-brasileiro-b", "brasileiro-serie-b-2026"},
 	{"Copa do Brasil", "copa-do-brasil", "copa-do-brasil-2026"},
 	{"Liga dos Campeões", "ligadoscampeoes", "liga-dos-campeoes-2026-2027"},
 	{"Campeonato Inglês", "campeonatoingles", "campeonato-ingles-2026-27"},
@@ -139,7 +140,7 @@ func main() {
 				}
 
 				sourceId, _ := repo.UpsertBroadcastSource(src.Name, srcType, src.OfficialLogoUrl)
-				repo.UpsertBroadcast(fixtureId, sourceId, src.Name, src.Description, src.URL, strconv.Itoa(src.TransmissionID))
+				repo.UpsertBroadcast(fixtureId, sourceId, src.Name, src.Description, src.URL, strconv.Itoa(src.TransmissionID), "ge")
 			}
 		}
 		
