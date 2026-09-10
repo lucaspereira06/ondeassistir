@@ -21,6 +21,7 @@ var channelLogos = map[string]string{
 	"espn 4":             "/logos_canais/espn4.png",
 	"band":               "/logos_canais/band.png",
 	"record":             "/logos_canais/record.png",
+	"record tv":          "/logos_canais/record.png",
 	"sbt":                "/logos_canais/sbt.png",
 	"romário tv":         "/logos_canais/romario_tv.png",
 	"sportynet":          "/logos_canais/sportynet.png",
@@ -162,12 +163,18 @@ func main() {
 				} else if strings.Contains(lowerNet, "prime video") || strings.Contains(lowerNet, "prime vídeo") || strings.Contains(lowerNet, "amazon prime") {
 					netName = "Prime Video"
 					lowerNet = "prime video"
-				} else if strings.Contains(lowerNet, "youtube tv romário") || strings.Contains(lowerNet, "youtube romário") {
+				} else if (strings.Contains(lowerNet, "youtube") || strings.Contains(lowerNet, "yt")) && (strings.Contains(lowerNet, "romário") || strings.Contains(lowerNet, "romario")) {
 					netName = "Romário TV"
 					lowerNet = "romário tv"
 				} else if strings.Contains(lowerNet, "xsports") || strings.Contains(lowerNet, "x-sports") {
 					netName = "Xsports"
 					lowerNet = "xsports"
+				} else if lowerNet == "getv" || lowerNet == "ge tv" {
+					netName = "Ge TV"
+					lowerNet = "ge tv"
+				} else if strings.Contains(lowerNet, "sportv") || lowerNet == "spor tv" {
+					netName = "sportv"
+					lowerNet = "sportv"
 				}
 
 				if strings.Contains(lowerNet, "play") || strings.Contains(lowerNet, "+") || strings.Contains(lowerNet, "max") || strings.Contains(lowerNet, "prime") || strings.Contains(lowerNet, "youtube") || strings.Contains(lowerNet, "cazé") || strings.Contains(lowerNet, "goat") {

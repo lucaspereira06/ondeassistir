@@ -227,16 +227,39 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
             <div key={champName} className={styles.championshipGroup}>
               <h2 className={styles.championshipTitle}><Trophy size={24} /> {champName}</h2>
               <div className={styles.grid}>
-                {matches.map((partida, idx) => {
-                  return (
-                    <React.Fragment key={partida.id}>
-                      <MatchCard partida={partida} />
-                      {(idx + 1) % 6 === 0 && (
-                        <AdSlot height="250px" className={styles.inFeedAd} />
-                      )}
-                    </React.Fragment>
-                  )
-                })}
+                {(() => {
+                  const items: React.ReactNode[] = []
+                  const N = matches.length
+
+                  let middleAdIdx = -1
+                  if (N >= 3 && N % 2 === 0) {
+                    middleAdIdx = Math.floor(N / 2) - 1
+                    // Garante que a quantidade de CARDS antes do ad seja par (0-indexed ímpar)
+                    // para que o ad caia numa posição ímpar (primeira coluna)
+                    if (middleAdIdx % 2 === 0) {
+                      middleAdIdx += 1
+                    }
+                  }
+
+                  matches.forEach((partida, idx) => {
+                    items.push(<MatchCard key={partida.id} partida={partida} />)
+
+                    if (idx === middleAdIdx) {
+                      items.push(
+                        <AdSlot key={`ad-mid-${idx}`} height="100%" className={styles.inFeedAd} />
+                      )
+                    }
+                  })
+
+                  // Ad no final para grupos com 3 ou mais jogos
+                  if (N >= 3) {
+                    items.push(
+                      <AdSlot key={`ad-end-${champName}`} height="100%" className={styles.inFeedAd} />
+                    )
+                  }
+
+                  return items
+                })()}
               </div>
             </div>
           ))}
