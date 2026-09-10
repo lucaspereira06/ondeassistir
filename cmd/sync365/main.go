@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -126,7 +127,12 @@ func main() {
 					srcType = "STREAMING"
 				}
 
-				sourceId, _ := repo.UpsertBroadcastSource(netName, srcType, "")
+				logoUrl := ""
+				if net.ID > 0 && net.ImageVersion > 0 {
+					logoUrl = fmt.Sprintf("https://imagecache.365scores.com/image/upload/f_png,w_48,h_48/v%d/TvNetworks/%d", net.ImageVersion, net.ID)
+				}
+
+				sourceId, _ := repo.UpsertBroadcastSource(netName, srcType, logoUrl)
 				err := repo.UpsertBroadcast(matchedFixture.ID, sourceId, netName, "", "", "", "365scores")
 				if err == nil {
 					insertedBroadcasts++

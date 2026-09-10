@@ -23,7 +23,12 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
-      - name: Run Sync Script
+      - name: Run GE Sync Script
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: go run cmd/sync/main.go
+
+      - name: Run 365Scores Sync Script
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: go run cmd/sync365/main.go

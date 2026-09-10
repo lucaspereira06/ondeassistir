@@ -76,8 +76,9 @@ func (c *Client) FetchGames(startDate, endDate string) ([]Game, error) {
 }
 
 type TVNetwork struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	ImageVersion int    `json:"imageVersion"`
 }
 
 type GameDetailsResponse struct {

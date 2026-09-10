@@ -36,14 +36,14 @@ export default function AdSlot({
   return (
     <div
       className={`${styles.adContainer} ${isSticky ? styles.sticky : ''} ${visibilityClass} ${className}`}
-      style={{ width, height, minHeight: '90px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}
+      style={{ width, height, minHeight: '90px', maxHeight: isSticky ? '100px' : 'none', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}
     >
       <ins
         className="adsbygoogle"
         style={{ display: 'block', width: '100%' }}
         data-ad-client="ca-pub-8998304443137528"
         data-ad-slot="1316239608"
-        data-ad-format="auto"
+        data-ad-format="horizontal"
         data-full-width-responsive="true"
       ></ins>
     </div>

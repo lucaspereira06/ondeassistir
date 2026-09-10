@@ -98,7 +98,7 @@ func (r *Repository) UpsertBroadcastSource(canonicalName, sourceType, logoUrl st
 		VALUES ($1, $2, $3)
 		ON CONFLICT (canonical_name) DO UPDATE SET
 			type = EXCLUDED.type,
-			logo_url = EXCLUDED.logo_url,
+			logo_url = COALESCE(NULLIF(EXCLUDED.logo_url, ''), broadcast_sources.logo_url),
 			updated_at = NOW()
 		RETURNING id;
 	`
