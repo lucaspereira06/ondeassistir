@@ -36,7 +36,7 @@ export default function AdSlot({
   return (
     <div
       className={`${styles.adContainer} ${isSticky ? styles.sticky : ''} ${visibilityClass} ${className}`}
-      style={{ width, height, minHeight: '90px', maxHeight: isSticky ? '100px' : 'none', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}
+      style={{ width, height, minHeight: '90px', maxHeight: height !== 'auto' ? height : '100px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}
     >
       <ins
         className="adsbygoogle"
