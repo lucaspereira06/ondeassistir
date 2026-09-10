@@ -6,20 +6,26 @@ import { Fixture } from '../types'
 
 interface MatchCardProps {
   partida: Fixture
+  showChampionship?: boolean
+  status?: 'upcoming' | 'live' | 'finished'
 }
 
-export default function MatchCard({ partida }: MatchCardProps) {
+export default function MatchCard({ partida, showChampionship = false, status = 'upcoming' }: MatchCardProps) {
   const matchDateObj = new Date(partida.start_at)
   const dateStr = matchDateObj.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
   const timeStr = matchDateObj.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' })
   
   return (
-    <div className={`glass-card ${styles.card}`}>
+    <div className={`glass-card ${styles.card} ${status === 'finished' ? styles.cardFinished : ''}`}>
       <Link href={`/jogo/${partida.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className={styles.matchHeader}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--primary)' }}>
-            <Clock size={16} /> {dateStr} às {timeStr}
+            {status === 'live' && <span className={styles.liveIndicator}></span>}
+            {status === 'live' ? <span style={{color: '#ef4444', fontWeight: 'bold'}}>AO VIVO</span> : <><Clock size={16} /> {dateStr} às {timeStr}</>}
           </span>
+          {showChampionship && partida.competition?.name && (
+            <span className={styles.championshipBadge}>{partida.competition.name}</span>
+          )}
         </div>
 
         <div className={styles.teams}>

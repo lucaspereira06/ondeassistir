@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useMemo, useRef, MouseEvent as ReactMouseEvent } from 'react'
+import React, { useState, useMemo, useRef, useEffect, MouseEvent as ReactMouseEvent } from 'react'
 import styles from '@/app/page.module.css'
-import { Filter, Trophy, Search } from 'lucide-react'
+import { Filter, Trophy, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import AdSlot from '@/components/AdSlot'
 import MatchCard from '@/components/MatchCard'
 import { Fixture } from '@/types'
@@ -16,29 +16,19 @@ interface HomeClientProps {
   initialPartidas: Fixture[]
 }
 
-export default function HomeClient({ initialPartidas }: HomeClientProps) {
-  const formatterDateOnly = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' })
-  const todayStr = formatterDateOnly.format(new Date())
-
-  const [filterDate, setFilterDate] = useState<string>(todayStr)
-  const [filterTeam, setFilterTeam] = useState<string>('all')
-  const [filterChamp, setFilterChamp] = useState<string>('all')
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-
-  // Drag to scroll logic
-  const scrollRef = useRef<HTMLDivElement>(null)
+function useDragScroll() {
+  const ref = useRef<HTMLDivElement>(null)
   const [isMouseDown, setIsMouseDown] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
 
   const onMouseDown = (e: ReactMouseEvent) => {
-    if (!scrollRef.current) return
+    if (!ref.current) return
     setIsMouseDown(true)
     setIsDragging(false)
-    setStartX(e.pageX - scrollRef.current.offsetLeft)
-    setScrollLeft(scrollRef.current.scrollLeft)
+    setStartX(e.pageX - ref.current.offsetLeft)
+    setScrollLeft(ref.current.scrollLeft)
   }
 
   const onMouseLeave = () => {
@@ -52,20 +42,31 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
   }
 
   const onMouseMove = (e: ReactMouseEvent) => {
-    if (!isMouseDown || !scrollRef.current) return
-    const x = e.pageX - scrollRef.current.offsetLeft
+    if (!isMouseDown || !ref.current) return
+    const x = e.pageX - ref.current.offsetLeft
     const walk = (x - startX) * 2
-
-    // Threshold to prevent accidental drags on clicks
-    if (Math.abs(walk) > 10) {
-      setIsDragging(true)
-    }
-
+    if (Math.abs(walk) > 10) setIsDragging(true)
     if (isDragging) {
       e.preventDefault()
-      scrollRef.current.scrollLeft = scrollLeft - walk
+      ref.current.scrollLeft = scrollLeft - walk
     }
   }
+
+  return { ref, isDragging, onMouseDown, onMouseLeave, onMouseUp, onMouseMove }
+}
+
+export default function HomeClient({ initialPartidas }: HomeClientProps) {
+  const formatterDateOnly = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' })
+  const todayStr = formatterDateOnly.format(new Date())
+
+  const [filterDate, setFilterDate] = useState<string>(todayStr)
+  const [filterTeam, setFilterTeam] = useState<string>('all')
+  const [filterChamp, setFilterChamp] = useState<string>('all')
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
+
+  const dragFilters = useDragScroll()
+  const dragCarousel = useDragScroll()
 
   // Generate date tabs
   const dateTabs: DateOption[] = useMemo(() => {
@@ -134,16 +135,86 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
     })
   }, [initialPartidas, filterDate, filterChamp, filterTeam, searchTerm])
 
-  // Group by championship
+  const [now, setNow] = useState<number | null>(null)
+
+  useEffect(() => {
+    setNow(Date.now())
+    const interval = setInterval(() => setNow(Date.now()), 60000) // Update every minute
+    return () => clearInterval(interval)
+  }, [])
+
+  const getMatchStatus = (start_at: string): 'upcoming' | 'live' | 'finished' => {
+    if (!now) return 'upcoming' // SSR Default
+    const matchTime = new Date(start_at).getTime()
+    const duration = 130 * 60 * 1000 // 130 mins
+    if (now > matchTime + duration) return 'finished'
+    if (now >= matchTime && now <= matchTime + duration) return 'live'
+    return 'upcoming'
+  }
+
+  const getChampPriority = (champName: string | undefined): number => {
+    if (!champName) return 99
+    const lower = champName.toLowerCase()
+    if (lower.includes('libertadores')) return 1
+    if (lower === 'campeonato brasileiro' || lower === 'campeonato brasileiro série a' || lower === 'brasileirão') return 2
+    if (lower.includes('sul-americana')) return 3
+    if (lower.includes('copa do brasil')) return 4
+    if (lower.includes('liga dos campeões') || lower.includes('champions league')) return 5
+    if (lower.includes('série b')) return 6
+    return 99
+  }
+
+  const { carouselMatches, normalMatches, finishedMatches } = useMemo(() => {
+    const normal: Fixture[] = []
+    const finished: Fixture[] = []
+
+    // Lista normal e encerrados obedecem aos filtros da tela
+    filtered.forEach(p => {
+      const status = getMatchStatus(p.start_at)
+      if (status === 'finished') {
+        finished.push(p)
+      } else {
+        normal.push(p)
+      }
+    })
+
+    // Carrossel consome TUDO (ignora aba de dias/busca), e tira os encerrados
+    const carouselCandidates = initialPartidas.filter(p => getMatchStatus(p.start_at) !== 'finished')
+
+    carouselCandidates.sort((a, b) => {
+      const statusA = getMatchStatus(a.start_at)
+      const statusB = getMatchStatus(b.start_at)
+
+      // 1. Ao Vivo primeiro
+      if (statusA === 'live' && statusB !== 'live') return -1
+      if (statusB === 'live' && statusA !== 'live') return 1
+
+      // 2. Prioridade do Campeonato
+      const prioA = getChampPriority(a.competition?.name)
+      const prioB = getChampPriority(b.competition?.name)
+      if (prioA !== prioB) return prioA - prioB
+
+      // 3. Cronologia
+      return new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+    })
+
+    return {
+      carouselMatches: carouselCandidates.slice(0, 15),
+      normalMatches: normal,
+      finishedMatches: finished.sort((a, b) => new Date(b.start_at).getTime() - new Date(a.start_at).getTime()) // Most recent finished first
+    }
+  }, [filtered, initialPartidas, now])
+
+  // Group normal matches by championship
   const grouped = useMemo(() => {
     const map = new Map<string, Fixture[]>()
-    filtered.forEach(p => {
+    normalMatches.forEach(p => {
       const champName = p.competition?.name || 'Outros'
       if (!map.has(champName)) map.set(champName, [])
       map.get(champName)!.push(p)
     })
     return Array.from(map.entries())
-  }, [filtered])
+  }, [normalMatches])
 
   return (
     <main className={`container animate-enter`}>
@@ -151,6 +222,48 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
         <h1 className="title">Encontre o jogo do seu time</h1>
         <p className="subtitle">Descubra em qual canal vai passar o jogo em segundos.</p>
       </header>
+
+      <AdSlot height="90px" />
+
+      {carouselMatches.length > 0 && (
+        <div style={{ marginBottom: '0rem', marginLeft: '-1rem', marginRight: '-1rem', position: 'relative' }}>
+          <h2 className={styles.championshipTitle} style={{ paddingLeft: '1rem', borderBottom: 'none', marginBottom: '0.5rem' }}>
+            <span style={{ color: '#ef4444' }}>●</span> Ao Vivo e Próximos
+          </h2>
+
+          <button 
+            className={`${styles.carouselArrow} ${styles.left}`}
+            onClick={() => dragCarousel.ref.current?.scrollBy({ left: -320, behavior: 'smooth' })}
+            aria-label="Rolar para a esquerda"
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          <div 
+            className={`${styles.carouselWrapper} ${dragCarousel.isDragging ? styles.dragging : ''}`} 
+            style={{ paddingLeft: '1rem', paddingRight: '1rem' }}
+            ref={dragCarousel.ref}
+            onMouseDown={dragCarousel.onMouseDown}
+            onMouseLeave={dragCarousel.onMouseLeave}
+            onMouseUp={dragCarousel.onMouseUp}
+            onMouseMove={dragCarousel.onMouseMove}
+          >
+            {carouselMatches.map(p => (
+              <div key={`car-${p.id}`} className={styles.carouselCard}>
+                <MatchCard partida={p} status={getMatchStatus(p.start_at)} showChampionship={true} />
+              </div>
+            ))}
+          </div>
+
+          <button 
+            className={`${styles.carouselArrow} ${styles.right}`}
+            onClick={() => dragCarousel.ref.current?.scrollBy({ left: 320, behavior: 'smooth' })}
+            aria-label="Rolar para a direita"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+      )}
 
       <AdSlot height="90px" />
 
@@ -167,12 +280,12 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
 
       <div className={styles.filtersWrapper}>
         <div
-          className={`${styles.filters} ${isDragging ? styles.dragging : ''}`}
-          ref={scrollRef}
-          onMouseDown={onMouseDown}
-          onMouseLeave={onMouseLeave}
-          onMouseUp={onMouseUp}
-          onMouseMove={onMouseMove}
+          className={`${styles.filters} ${dragFilters.isDragging ? styles.dragging : ''}`}
+          ref={dragFilters.ref}
+          onMouseDown={dragFilters.onMouseDown}
+          onMouseLeave={dragFilters.onMouseLeave}
+          onMouseUp={dragFilters.onMouseUp}
+          onMouseMove={dragFilters.onMouseMove}
         >
           {dateTabs.map(tab => (
             <button
@@ -217,7 +330,7 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
 
       <div className={styles.layout}>
         <div className={styles.content}>
-          {grouped.length === 0 && (
+          {grouped.length === 0 && normalMatches.length === 0 && finishedMatches.length === 0 && (
             <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
               Nenhuma partida encontrada para estes filtros.
             </div>
@@ -234,15 +347,13 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
                   let middleAdIdx = -1
                   if (N >= 3 && N % 2 === 0) {
                     middleAdIdx = Math.floor(N / 2) - 1
-                    // Garante que a quantidade de CARDS antes do ad seja par (0-indexed ímpar)
-                    // para que o ad caia numa posição ímpar (primeira coluna)
                     if (middleAdIdx % 2 === 0) {
                       middleAdIdx += 1
                     }
                   }
 
                   matches.forEach((partida, idx) => {
-                    items.push(<MatchCard key={partida.id} partida={partida} />)
+                    items.push(<MatchCard key={partida.id} partida={partida} status={getMatchStatus(partida.start_at)} />)
 
                     if (idx === middleAdIdx) {
                       items.push(
@@ -251,7 +362,6 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
                     }
                   })
 
-                  // Ad no final para grupos com 3 ou mais jogos
                   if (N >= 3) {
                     items.push(
                       <AdSlot key={`ad-end-${champName}`} height="100%" className={styles.inFeedAd} />
@@ -263,6 +373,19 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
               </div>
             </div>
           ))}
+
+          {finishedMatches.length > 0 && (
+            <div className={styles.championshipGroup} style={{ marginTop: '3rem' }}>
+              <h2 className={styles.championshipTitle} style={{ opacity: 0.7 }}>
+                Jogos Encerrados
+              </h2>
+              <div className={styles.grid}>
+                {finishedMatches.map((partida) => (
+                  <MatchCard key={`fin-${partida.id}`} partida={partida} status="finished" showChampionship={true} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <aside className={styles.sidebar}>

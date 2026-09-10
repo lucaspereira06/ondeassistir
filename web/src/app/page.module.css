@@ -333,3 +333,109 @@
   color: #9ca3af;
 }
 
+/* Novos estilos de UX: Ao Vivo e Encerrados */
+.cardFinished {
+  opacity: 0.6;
+  filter: grayscale(0.8);
+  transition: all 0.3s ease;
+}
+
+.cardFinished:hover {
+  opacity: 1;
+  filter: grayscale(0);
+}
+
+.liveIndicator {
+  width: 10px;
+  height: 10px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ef4444;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.championshipBadge {
+  background: rgba(0,0,0,0.06);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.carouselWrapper {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0 0.5rem 0;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carouselWrapper.dragging {
+  scroll-snap-type: none;
+}
+
+.carouselWrapper.dragging a {
+  pointer-events: none;
+}
+
+.carouselArrow {
+  position: absolute;
+  top: 55%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  color: var(--primary);
+  transition: all 0.2s;
+}
+
+.carouselArrow:hover {
+  background: #f8fafc;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.carouselArrow.left {
+  left: 0;
+}
+
+.carouselArrow.right {
+  right: 0;
+}
+
+/* Ocultar as setas em telas pequenas (mobile), onde o swipe natural (dedo) é melhor */
+@media (max-width: 768px) {
+  .carouselArrow {
+    display: none;
+  }
+}
+
+.carouselWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.carouselCard {
+  scroll-snap-align: start;
+  flex: 0 0 300px;
+}
