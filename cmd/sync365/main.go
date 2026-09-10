@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -12,19 +13,20 @@ import (
 )
 
 var channelLogos = map[string]string{
-	"cazétv": "/logos_canais/cazetv.png",
-	"canal goat": "/logos_canais/canalgoat.png",
-	"tnt sports": "/logos_canais/tnt_sports.png",
-	"space": "/logos_canais/space.png",
-	"espn": "/logos_canais/espn.png",
-	"espn 4": "/logos_canais/espn4.png",
-	"band": "/logos_canais/band.png",
-	"record": "/logos_canais/record.png",
-	"sbt": "/logos_canais/sbt.png",
-	"romário tv": "/logos_canais/romario_tv.png",
-	"sportynet": "/logos_canais/sportynet.png",
-	"x-sports": "/logos_canais/xsports.png",
-	"youtube sportynet": "/logos_canais/youtube_sportynet.png",
+	"cazétv":             "/logos_canais/cazetv.png",
+	"canal goat":         "/logos_canais/canalgoat.png",
+	"tnt sports":         "/logos_canais/tnt_sports.png",
+	"space":              "/logos_canais/space.png",
+	"espn":               "/logos_canais/espn.png",
+	"espn 4":             "/logos_canais/espn4.png",
+	"band":               "/logos_canais/band.png",
+	"record":             "/logos_canais/record.png",
+	"sbt":                "/logos_canais/sbt.png",
+	"romário tv":         "/logos_canais/romario_tv.png",
+	"sportynet":          "/logos_canais/sportynet.png",
+	"xsports":            "/logos_canais/xsports.png",
+	"x-sports":           "/logos_canais/xsports.png",
+	"youtube sportynet":  "/logos_canais/youtube_sportynet.png",
 }
 
 func normalizeTeamName(name string, aliases map[string]string) string {
@@ -62,10 +64,24 @@ func main() {
 	client := scores365.NewClient()
 
 	now := time.Now()
-	startDate := now.AddDate(0, 0, -1) // D-1
-	endDate := now.AddDate(0, 0, 6)    // D+6
-	
-	log.Printf("Iniciando sync 365Scores de D-1 até D+6")
+
+	startDays := -1
+	endDays := 6
+	if val := os.Getenv("START_DAYS"); val != "" {
+		if n, err := strconv.Atoi(val); err == nil {
+			startDays = n
+		}
+	}
+	if val := os.Getenv("END_DAYS"); val != "" {
+		if n, err := strconv.Atoi(val); err == nil {
+			endDays = n
+		}
+	}
+
+	startDate := now.AddDate(0, 0, startDays) // calculado dinamicamente
+	endDate := now.AddDate(0, 0, endDays)      // calculado dinamicamente
+
+	log.Printf("Iniciando sync 365Scores de %s até %s", startDate.Format("02/01/2006"), endDate.Format("02/01/2006"))
 
 	// Buscar todos os fixtures do nosso banco de D-1 até D+6
 	fixtures, err := repo.GetFixturesInDateRange(startDate.Add(-24*time.Hour), endDate.Add(24*time.Hour))
@@ -139,13 +155,19 @@ func main() {
 				srcType := "TV"
 				lowerNet := strings.ToLower(netName)
 
-				// Normalização de Nomes dos Canais (Exibição)
+					// Normalização de Nomes dos Canais (Exibição)
 				if strings.Contains(lowerNet, "youtube tnt sports") {
 					netName = "TNT Sports"
 					lowerNet = "tnt sports"
 				} else if strings.Contains(lowerNet, "prime video") || strings.Contains(lowerNet, "prime vídeo") || strings.Contains(lowerNet, "amazon prime") {
-					netName = "Prime Vídeo"
-					lowerNet = "prime vídeo"
+					netName = "Prime Video"
+					lowerNet = "prime video"
+				} else if strings.Contains(lowerNet, "youtube tv romário") || strings.Contains(lowerNet, "youtube romário") {
+					netName = "Romário TV"
+					lowerNet = "romário tv"
+				} else if strings.Contains(lowerNet, "xsports") || strings.Contains(lowerNet, "x-sports") {
+					netName = "Xsports"
+					lowerNet = "xsports"
 				}
 
 				if strings.Contains(lowerNet, "play") || strings.Contains(lowerNet, "+") || strings.Contains(lowerNet, "max") || strings.Contains(lowerNet, "prime") || strings.Contains(lowerNet, "youtube") || strings.Contains(lowerNet, "cazé") || strings.Contains(lowerNet, "goat") {

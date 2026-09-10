@@ -4,7 +4,16 @@ on:
   schedule:
     # Executa todos os dias às 07:00 UTC (04:00 Horário de Brasília)
     - cron: '0 7 * * *'
-  workflow_dispatch: # Permite executar o script manualmente pelo painel
+  workflow_dispatch:
+    inputs:
+      start_days:
+        description: 'Início (dias a partir de hoje, ex: -1 = ontem, 0 = hoje)'
+        required: false
+        default: ''
+      end_days:
+        description: 'Fim (dias a partir de hoje, ex: 1 = amanhã, 7 = próxima semana)'
+        required: false
+        default: ''
 
 jobs:
   sync:
@@ -22,6 +31,26 @@ jobs:
 
       - name: Install dependencies
         run: go mod download
+
+      - name: Set sync date window
+        run: |
+          # Prioriza inputs manuais, caso existam
+          if [ -n "${{ github.event.inputs.start_days }}" ] && [ -n "${{ github.event.inputs.end_days }}" ]; then
+            echo "START_DAYS=${{ github.event.inputs.start_days }}" >> $GITHUB_ENV
+            echo "END_DAYS=${{ github.event.inputs.end_days }}" >> $GITHUB_ENV
+            echo "Manual: janela customizada (D${{ github.event.inputs.start_days }} até D+${{ github.event.inputs.end_days }})"
+          else
+            DAY_OF_WEEK=$(date +%u) # 1=Segunda ... 7=Domingo
+            if [ "$DAY_OF_WEEK" -eq 7 ]; then
+              echo "START_DAYS=-1" >> $GITHUB_ENV
+              echo "END_DAYS=7" >> $GITHUB_ENV
+              echo "Domingo: janela semanal (D-1 até D+7)"
+            else
+              echo "START_DAYS=0" >> $GITHUB_ENV
+              echo "END_DAYS=1" >> $GITHUB_ENV
+              echo "Dia útil: janela curta (hoje e amanhã)"
+            fi
+          fi
 
       - name: Run GE Sync Script
         env:

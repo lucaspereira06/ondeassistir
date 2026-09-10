@@ -66,8 +66,22 @@ func main() {
 	repo := db.NewRepository(database.DB)
 
 	now := time.Now()
-	startDate := now.AddDate(0, 0, -1).Format("2006-01-02")
-	endDate := now.AddDate(0, 0, 6).Format("2006-01-02")
+
+	startDays := -1
+	endDays := 6
+	if val := os.Getenv("START_DAYS"); val != "" {
+		if n, err := strconv.Atoi(val); err == nil {
+			startDays = n
+		}
+	}
+	if val := os.Getenv("END_DAYS"); val != "" {
+		if n, err := strconv.Atoi(val); err == nil {
+			endDays = n
+		}
+	}
+
+	startDate := now.AddDate(0, 0, startDays).Format("2006-01-02")
+	endDate := now.AddDate(0, 0, endDays).Format("2006-01-02")
 
 	log.Printf("Iniciando sync de %s até %s usando GE GraphQL", startDate, endDate)
 
@@ -134,13 +148,20 @@ func main() {
 				}
 
 				srcType := "TV"
-				lowerName := strings.ToLower(src.Name)
+				srcName := src.Name
+				lowerName := strings.ToLower(srcName)
+
 				if strings.Contains(lowerName, "play") || strings.Contains(lowerName, "+") || strings.Contains(lowerName, "max") || strings.Contains(lowerName, "prime") || strings.Contains(lowerName, "tv") || strings.Contains(lowerName, "youtube") {
 					srcType = "STREAMING"
 				}
 
-				sourceId, _ := repo.UpsertBroadcastSource(src.Name, srcType, src.OfficialLogoUrl)
-				repo.UpsertBroadcast(fixtureId, sourceId, src.Name, src.Description, src.URL, strconv.Itoa(src.TransmissionID), "ge")
+				// Normalização de nomes dos canais
+				if strings.Contains(lowerName, "amazon prime") || strings.Contains(lowerName, "prime video") || strings.Contains(lowerName, "prime vídeo") {
+					srcName = "Prime Video"
+				}
+
+				sourceId, _ := repo.UpsertBroadcastSource(srcName, srcType, src.OfficialLogoUrl)
+				repo.UpsertBroadcast(fixtureId, sourceId, srcName, src.Description, src.URL, strconv.Itoa(src.TransmissionID), "ge")
 			}
 		}
 		
