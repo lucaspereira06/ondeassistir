@@ -1,4 +1,6 @@
-import React from 'react'
+'use client'
+
+import React, { useEffect } from 'react'
 import styles from './AdSlot.module.css'
 
 interface AdSlotProps {
@@ -12,12 +14,21 @@ interface AdSlotProps {
 
 export default function AdSlot({
   width = '100%',
-  height = '100%',
+  height = 'auto',
   isSticky = false,
   className = '',
   hideOnMobile = false,
   hideOnDesktop = false,
 }: AdSlotProps) {
+  useEffect(() => {
+    try {
+      // @ts-ignore
+      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+    } catch (err) {
+      console.error('AdSense error:', err)
+    }
+  }, [])
+
   let visibilityClass = ''
   if (hideOnMobile) visibilityClass = styles.hideOnMobile
   if (hideOnDesktop) visibilityClass = styles.hideOnDesktop
@@ -25,11 +36,16 @@ export default function AdSlot({
   return (
     <div
       className={`${styles.adContainer} ${isSticky ? styles.sticky : ''} ${visibilityClass} ${className}`}
-      style={{ width, height }}
+      style={{ width, height, minHeight: '90px', display: 'flex', justifyContent: 'center', overflow: 'hidden' }}
     >
-      <div className={styles.adPlaceholder}>
-        <span className={styles.adText}>Publicidade</span>
-      </div>
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block', width: '100%' }}
+        data-ad-client="ca-pub-8998304443137528"
+        data-ad-slot="1316239608"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
     </div>
   )
 }
