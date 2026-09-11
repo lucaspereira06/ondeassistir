@@ -178,8 +178,14 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
       }
     })
 
-    // Carrossel consome TUDO (ignora aba de dias/busca), e tira os encerrados
-    const carouselCandidates = initialPartidas.filter(p => getMatchStatus(p.start_at) !== 'finished')
+    // Carrossel consome apenas jogos de HOJE que não estão encerrados
+    const carouselCandidates = initialPartidas.filter(p => {
+      if (getMatchStatus(p.start_at) === 'finished') return false
+      
+      const matchDateObj = new Date(p.start_at)
+      const matchDateStr = formatterDateOnly.format(matchDateObj)
+      return matchDateStr === todayStr
+    })
 
     carouselCandidates.sort((a, b) => {
       const statusA = getMatchStatus(a.start_at)
