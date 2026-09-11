@@ -108,7 +108,12 @@ export default async function JogoPage({ params }: { params: Promise<{ slug: str
     },
     location: {
       '@type': 'Place',
-      name: partida.location || 'A Definir'
+      name: partida.location || 'A Definir',
+      address: {
+        '@type': 'PostalAddress',
+        addressCountry: 'BR',
+        addressLocality: 'Brasil'
+      }
     },
     description: `Assista ${partida.home_team?.popular_name} x ${partida.away_team?.popular_name} ao vivo.`,
   }

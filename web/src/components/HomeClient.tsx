@@ -181,7 +181,7 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
     // Carrossel consome apenas jogos de HOJE que não estão encerrados
     const carouselCandidates = initialPartidas.filter(p => {
       if (getMatchStatus(p.start_at) === 'finished') return false
-      
+
       const matchDateObj = new Date(p.start_at)
       const matchDateStr = formatterDateOnly.format(matchDateObj)
       return matchDateStr === todayStr
@@ -229,49 +229,50 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
         <p className="subtitle">Descubra em qual canal vai passar o jogo em segundos.</p>
       </header>
 
-      <AdSlot height="90px" />
+      <AdSlot height="90px" responsive={false} />
 
       {carouselMatches.length > 0 && (
-        <div style={{ marginBottom: '0rem', marginLeft: '-1rem', marginRight: '-1rem', position: 'relative' }}>
-          <h2 className={styles.championshipTitle} style={{ paddingLeft: '1rem', borderBottom: 'none', marginBottom: '0.5rem' }}>
-            <span style={{ color: '#ef4444' }}>●</span> Ao Vivo e Próximos
-          </h2>
+        <div>
+          <div style={{ marginBottom: '2rem', marginLeft: '-1rem', marginRight: '-1rem', position: 'relative' }}>
+            <h2 className={styles.championshipTitle} style={{ paddingLeft: '1rem', borderBottom: 'none', marginBottom: '0.5rem' }}>
+              Destaques
+            </h2>
 
-          <button 
-            className={`${styles.carouselArrow} ${styles.left}`}
-            onClick={() => dragCarousel.ref.current?.scrollBy({ left: -320, behavior: 'smooth' })}
-            aria-label="Rolar para a esquerda"
-          >
-            <ChevronLeft size={24} />
-          </button>
+            <button
+              className={`${styles.carouselArrow} ${styles.left}`}
+              onClick={() => dragCarousel.ref.current?.scrollBy({ left: -320, behavior: 'smooth' })}
+              aria-label="Rolar para a esquerda"
+            >
+              <ChevronLeft size={24} />
+            </button>
 
-          <div 
-            className={`${styles.carouselWrapper} ${dragCarousel.isDragging ? styles.dragging : ''}`} 
-            style={{ paddingLeft: '1rem', paddingRight: '1rem' }}
-            ref={dragCarousel.ref}
-            onMouseDown={dragCarousel.onMouseDown}
-            onMouseLeave={dragCarousel.onMouseLeave}
-            onMouseUp={dragCarousel.onMouseUp}
-            onMouseMove={dragCarousel.onMouseMove}
-          >
-            {carouselMatches.map(p => (
-              <div key={`car-${p.id}`} className={styles.carouselCard}>
-                <MatchCard partida={p} status={getMatchStatus(p.start_at)} showChampionship={true} />
-              </div>
-            ))}
+            <div
+              className={`${styles.carouselWrapper} ${dragCarousel.isDragging ? styles.dragging : ''}`}
+              style={{ paddingLeft: '1rem', paddingRight: '1rem' }}
+              ref={dragCarousel.ref}
+              onMouseDown={dragCarousel.onMouseDown}
+              onMouseLeave={dragCarousel.onMouseLeave}
+              onMouseUp={dragCarousel.onMouseUp}
+              onMouseMove={dragCarousel.onMouseMove}
+            >
+              {carouselMatches.map(p => (
+                <div key={`car-${p.id}`} className={styles.carouselCard}>
+                  <MatchCard partida={p} status={getMatchStatus(p.start_at)} showChampionship={true} />
+                </div>
+              ))}
+            </div>
+
+            <button
+              className={`${styles.carouselArrow} ${styles.right}`}
+              onClick={() => dragCarousel.ref.current?.scrollBy({ left: 320, behavior: 'smooth' })}
+              aria-label="Rolar para a direita"
+            >
+              <ChevronRight size={24} />
+            </button>
           </div>
-
-          <button 
-            className={`${styles.carouselArrow} ${styles.right}`}
-            onClick={() => dragCarousel.ref.current?.scrollBy({ left: 320, behavior: 'smooth' })}
-            aria-label="Rolar para a direita"
-          >
-            <ChevronRight size={24} />
-          </button>
+          <AdSlot height="90px" responsive={false} />
         </div>
       )}
-
-      <AdSlot height="90px" />
 
       <div className={styles.searchWrapper}>
         <Search className={styles.searchIcon} size={20} />
@@ -399,7 +400,7 @@ export default function HomeClient({ initialPartidas }: HomeClientProps) {
         </aside>
       </div>
 
-      <AdSlot height="60px" isSticky />
+      <AdSlot height="60px" isSticky responsive={false} />
     </main>
   )
 }

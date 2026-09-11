@@ -11,6 +11,7 @@ interface AdSlotProps {
   className?: string
   hideOnMobile?: boolean
   hideOnDesktop?: boolean
+  responsive?: boolean
 }
 
 export default function AdSlot({
@@ -21,6 +22,7 @@ export default function AdSlot({
   className = '',
   hideOnMobile = false,
   hideOnDesktop = false,
+  responsive = true,
 }: AdSlotProps) {
   useEffect(() => {
     try {
@@ -46,7 +48,7 @@ export default function AdSlot({
         data-ad-client="ca-pub-8998304443137528"
         data-ad-slot="1316239608"
         data-ad-format={format}
-        data-full-width-responsive="true"
+        data-full-width-responsive={responsive ? "true" : "false"}
       ></ins>
     </div>
   )
